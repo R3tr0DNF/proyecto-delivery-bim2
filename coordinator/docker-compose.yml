@@ -1,0 +1,24 @@
+services:
+
+coordinator:
+  image: citusdata/citus:12.1
+  container_name: coordinator_r3tr0
+
+  restart: unless-stopped
+
+  ports:
+    - "35567:35568"
+  
+  environment:
+    POSTGRES_PASSWORD: "postgres"
+    POSTGRES_USER: "postgres"
+    POSTGRES_DB: "delivery_db"
+
+  volumes:
+    - coordinator_data:/var/lib/postgresql/data
+    - ./init:/docker-entrypoint-initdb.d
+
+volumes:
+  coordinator_data:
+
+  
