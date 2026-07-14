@@ -1,0 +1,138 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: #f3f4f6;
+    color: #111827;
+}
+
+header {
+    background: #111827;
+    color: white;
+    padding: 24px;
+    text-align: center;
+}
+
+header h1 {
+    margin: 0;
+}
+
+header p {
+    margin-top: 8px;
+    color: #d1d5db;
+}
+
+main {
+    width: 92%;
+    max-width: 1200px;
+    margin: 24px auto;
+}
+
+.tarjeta {
+    background: white;
+    padding: 22px;
+    border-radius: 12px;
+    margin-bottom: 22px;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+}
+
+.tarjeta h2 {
+    margin-top: 0;
+    color: #1f2937;
+}
+
+.tarjeta h3 {
+    margin-top: 20px;
+    color: #374151;
+}
+
+.formulario {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+input,
+select {
+    padding: 10px;
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    min-width: 160px;
+    font-size: 14px;
+}
+
+button {
+    padding: 10px 16px;
+    border: none;
+    border-radius: 8px;
+    background: #2563eb;
+    color: white;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+}
+
+button:hover {
+    background: #1d4ed8;
+}
+
+.boton-danger {
+    background: #dc2626;
+}
+
+.boton-danger:hover {
+    background: #b91c1c;
+}
+
+.botones {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+    margin-bottom: 16px;
+}
+
+.resultado {
+    margin-top: 14px;
+    background: #0f172a;
+    color: #e5e7eb;
+    padding: 16px;
+    border-radius: 10px;
+    overflow-x: auto;
+    white-space: pre-wrap;
+    font-family: Consolas, monospace;
+    font-size: 13px;
+    min-height: 50px;
+}
+
+.tabla {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 12px;
+    background: white;
+    color: #111827;
+}
+
+.tabla th,
+.tabla td {
+    border: 1px solid #d1d5db;
+    padding: 8px;
+    text-align: left;
+}
+
+.tabla th {
+    background: #e5e7eb;
+}
+
+.etiqueta {
+    display: inline-block;
+    padding: 6px 10px;
+    background: #dbeafe;
+    color: #1e40af;
+    border-radius: 8px;
+    font-weight: bold;
+    margin-bottom: 10px;
+}

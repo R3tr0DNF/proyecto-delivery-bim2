@@ -1,0 +1,1172 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>UBEREATS</title>
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <style>
+        .neon-text {
+            text-shadow: 0 0 8px rgba(34, 197, 94, 0.4);
+        }
+
+        .boton-menu-activo {
+            background-color: rgb(22 163 74);
+            color: white;
+            border-color: rgb(34 197 94);
+        }
+
+        .boton-menu-inactivo {
+            background-color: rgb(17 24 39);
+            color: rgb(156 163 175);
+            border-color: rgb(55 65 81);
+        }
+    </style>
+</head>
+
+<body class="bg-gray-950 text-gray-100 font-sans min-h-screen flex flex-col">
+
+    <header class="border-b border-gray-800 bg-gray-900 px-6 py-4">
+        <div class="flex flex-col lg:flex-row lg:justify-between lg:items-center gap-4">
+
+            <div class="flex items-center space-x-3">
+                <i class="fa-solid fa-database text-green-500 text-2xl"></i>
+
+                <div>
+                    <h1 class="text-xl font-bold tracking-wider text-white">
+                        UBER<span class="text-green-500 font-black">EATS</span>
+                    </h1>
+                </div>
+            </div>
+
+            <nav class="flex flex-wrap gap-3 items-center">
+                <button id="btnMenuInsercion" onclick="mostrarVista('insercion')" class="boton-menu-activo px-4 py-2 rounded border text-xs font-bold uppercase tracking-wider transition">
+                    Inserción y Gestión
+                </button>
+
+                <button id="btnMenuConsultas" onclick="mostrarVista('consultas')" class="boton-menu-inactivo px-4 py-2 rounded border text-xs font-bold uppercase tracking-wider transition hover:bg-gray-800">
+                    Consultas Distribuidas
+                </button>
+
+                <button onclick="verificarConexion()" class="bg-gray-950 hover:bg-gray-800 px-4 py-2 rounded border border-gray-800 text-xs font-bold text-gray-300 uppercase tracking-wider transition">
+                    Probar conexión
+                </button>
+            </nav>
+
+        </div>
+    </header>
+
+    <main class="flex-1 p-6">
+
+        <section class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
+
+            <div class="bg-gray-900 p-4 rounded-xl border border-gray-800 flex items-center justify-between shadow-lg">
+                <div>
+                    <p class="text-xs font-mono tracking-wider text-gray-400 uppercase">
+                        Última Latencia
+                    </p>
+                    <h3 id="lblLatencia" class="text-2xl font-black text-white font-mono mt-1">
+                        0.00 <span class="text-xs text-green-500 font-normal">ms</span>
+                    </h3>
+                </div>
+
+                <div class="w-10 h-10 rounded-lg bg-green-950/50 border border-green-800/50 flex items-center justify-center text-green-500">
+                    <i class="fa-solid fa-stopwatch text-lg"></i>
+                </div>
+            </div>
+
+            <div class="bg-gray-900 p-4 rounded-xl border border-gray-800 flex items-center justify-between shadow-lg">
+                <div>
+                    <p class="text-xs font-mono tracking-wider text-gray-400 uppercase">
+                        Operación Ejecutada
+                    </p>
+                    <h3 id="lblTipoQuery" class="text-xs font-bold text-gray-300 mt-2 truncate max-w-[240px]">
+                        Ninguna ejecutada
+                    </h3>
+                </div>
+
+                <div class="w-10 h-10 rounded-lg bg-blue-950/50 border border-blue-800/50 flex items-center justify-center text-blue-500">
+                    <i class="fa-solid fa-network-wired text-lg"></i>
+                </div>
+            </div>
+
+            <div class="bg-gray-900 p-4 rounded-xl border border-gray-800 flex items-center justify-between shadow-lg">
+                <div>
+                    <p class="text-xs font-mono tracking-wider text-gray-400 uppercase">
+                        Datos Distribuidos
+                    </p>
+                    <h3 class="text-2xl font-black text-white font-mono mt-1">
+                        > 500k <span class="text-xs text-gray-500 font-normal">Sintéticos</span>
+                    </h3>
+                </div>
+
+                <div class="w-10 h-10 rounded-lg bg-purple-950/50 border border-purple-800/50 flex items-center justify-center text-purple-500">
+                    <i class="fa-solid fa-database text-lg"></i>
+                </div>
+            </div>
+
+        </section>
+
+        <section id="vistaInsercion" class="grid grid-cols-1 xl:grid-cols-3 gap-6">
+
+            <div class="xl:col-span-1 space-y-6">
+
+                <div class="bg-gray-900 p-5 rounded-xl border border-gray-800 shadow-xl">
+                    <div class="mb-5">
+                        <p class="text-[10px] font-mono text-green-400 uppercase tracking-widest mb-1">
+                            Módulo 1
+                        </p>
+
+                        <h2 class="text-sm font-bold uppercase tracking-wider text-gray-300">
+                            Inserción y Gestión de Datos
+                        </h2>
+
+                        <p class="text-xs text-gray-500 mt-1">
+                            Registra pedidos, elimina registros y valida la ubicación distribuida usando cliente_id.
+                        </p>
+                    </div>
+
+                    <form id="formPedido" class="space-y-4">
+                        <h3 class="text-xs font-bold text-gray-400 uppercase">
+                            Insertar Nuevo Pedido
+                        </h3>
+
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">ID Cliente</label>
+                            <input type="number" id="cliId" class="w-full bg-gray-950 border border-gray-800 rounded px-3 py-2 text-sm focus:outline-none focus:border-green-500 text-white" placeholder="Ej: 10" required>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1">ID Restaurante</label>
+                                <input type="number" id="resId" class="w-full bg-gray-950 border border-gray-800 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-500 text-white" placeholder="Ej: 5" required>
+                            </div>
+
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1">ID Repartidor</label>
+                                <input type="number" id="repId" class="w-full bg-gray-950 border border-gray-800 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-500 text-white" placeholder="Ej: 8" required>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">Total Compra</label>
+                            <input type="number" step="0.01" id="totPed" class="w-full bg-gray-950 border border-gray-800 rounded px-3 py-2 text-sm focus:outline-none focus:border-blue-500 text-white" placeholder="Ej: 25.50" required>
+                        </div>
+
+                        <button type="submit" class="w-full bg-green-600 hover:bg-green-500 text-white text-xs font-bold uppercase tracking-wider py-2.5 rounded transition duration-200 shadow-lg shadow-green-900/20">
+                            Ingresar datos 
+                        </button>
+                    </form>
+
+                    <hr class="border-gray-800 my-5">
+
+                    <div class="space-y-4">
+                        <h3 class="text-xs font-bold uppercase text-red-400">
+                            Eliminación de un pedido
+                        </h3>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <input type="number" id="delPedId" class="bg-gray-950 border border-gray-800 rounded px-3 py-2 text-sm focus:outline-none focus:border-red-500 text-white" placeholder="ID Pedido">
+                            <input type="number" id="delCliId" class="bg-gray-950 border border-gray-800 rounded px-3 py-2 text-sm focus:outline-none focus:border-red-500 text-white" placeholder="ID Cliente">
+                        </div>
+
+                        <button onclick="eliminarPedido()" class="w-full bg-red-950/40 hover:bg-red-900 border border-red-800/60 text-red-400 text-xs font-bold uppercase tracking-wider py-2.5 rounded transition duration-200">
+                            Eliminar pedido
+                        </button>
+                    </div>
+                </div>
+
+                <div class="bg-gray-900 p-5 rounded-xl border border-gray-800 shadow-xl">
+                    <h2 class="text-sm font-bold uppercase tracking-wider text-gray-400 mb-3">
+                        Rastreador de Fragmentos
+                    </h2>
+
+                    <p class="text-xs text-gray-400 mb-4">
+                        Calcula el fragmento y nodo trabajador asignado por Citus según el cliente_id.
+                    </p>
+
+                    <div class="flex space-x-2">
+                        <input type="number" id="searchTargetId" class="flex-1 bg-gray-950 border border-gray-800 rounded px-3 py-1.5 text-sm focus:outline-none focus:border-green-500 text-white" placeholder="Ingrese cliente_id">
+
+                        <button onclick="buscarDestinoMeta()" class="bg-gray-800 hover:bg-gray-700 text-xs px-4 rounded border border-gray-700 font-bold">
+                            Buscar
+                        </button>
+                    </div>
+
+                    <div id="metaDestinoCard" class="hidden mt-4 p-3 bg-gray-950 rounded border border-gray-800 flex justify-between items-center">
+                        <div>
+                            <p class="text-[10px] text-gray-500 font-mono">NODO TRABAJADOR:</p>
+                            <p id="txtWorkerDestino" class="text-sm font-bold text-green-400 neon-text">---</p>
+                        </div>
+
+                        <div class="text-right">
+                            <p class="text-[10px] text-gray-500 font-mono">FRAGMENTO ID:</p>
+                            <p id="txtShardIdDestino" class="text-xs font-mono font-bold text-white">---</p>
+                        </div>
+                    </div>
+                </div>
+
+
+            </div>
+
+            <div class="xl:col-span-2 bg-gray-900 p-5 rounded-xl border border-gray-800 shadow-xl">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <p class="text-[10px] font-mono text-green-400 uppercase tracking-widest mb-1">
+                            Salida de operaciones
+                        </p>
+                        <h2 class="text-sm font-bold uppercase tracking-wider text-gray-300">
+                            Resultado de Inserción y Gestión
+                        </h2>
+                        <p class="text-xs text-gray-500 mt-1">
+                            Aquí se muestran los pedidos creados, eliminaciones, simulaciones y ubicación distribuida.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="bg-gray-950 rounded-xl border border-gray-800 overflow-hidden flex flex-col h-[620px]">
+                    <div class="bg-gray-900 px-4 py-2 border-b border-gray-800 flex justify-between items-center">
+                        <span class="text-xs font-mono font-bold text-gray-400">
+                            Resultado 
+                        </span>
+
+                        <button onclick="abrirJson('insercion')" class="text-[10px] text-gray-500 hover:text-green-400 border border-gray-800 hover:border-green-900 rounded px-2 py-0.5 transition">
+                            JSON
+                        </button>
+                    </div>
+
+                    <div class="flex-1 overflow-auto text-xs p-4 font-mono" id="contenedorResultadoInsercion">
+                        <p class="text-gray-500 text-center mt-64">
+                            Seleccione una operación de inserción o gestión para visualizar el resultado.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+        <section id="vistaConsultas" class="hidden grid grid-cols-1 xl:grid-cols-3 gap-6">
+
+            <div class="xl:col-span-1 bg-gray-900 p-5 rounded-xl border border-gray-800 shadow-xl">
+                <div class="mb-5">
+                    <p class="text-[10px] font-mono text-blue-400 uppercase tracking-widest mb-1">
+                        Módulo 2
+                    </p>
+
+                    <h2 class="text-sm font-bold uppercase tracking-wider text-gray-300">
+                        Consultas Distribuidas
+                    </h2>
+
+                    <p class="text-xs text-gray-500 mt-1">
+                        Ejecuta consultas analíticas y consultas localizadas sobre fragmentos distribuidos.
+                    </p>
+                </div>
+
+                <div class="space-y-3">
+                    <button onclick="ejecutarProductosMasVendidos()" class="w-full bg-gray-950 hover:bg-gray-800 border border-gray-800 rounded p-3 text-left transition group">
+                        <span class="text-xs font-bold text-white">Top 5 Productos Más Vendidos</span>
+                        <p class="text-[10px] text-gray-500 font-mono mt-1">Consulta agregada global</p>
+                    </button>
+
+                    <button onclick="ejecutarResumenEstados()" class="w-full bg-gray-950 hover:bg-gray-800 border border-gray-800 rounded p-3 text-left transition group">
+                        <span class="text-xs font-bold text-white">Resumen por Estados</span>
+                        <p class="text-[10px] text-gray-500 font-mono mt-1">Agrupación distribuida</p>
+                    </button>
+
+                    <button onclick="ejecutarHistorialRangos()" class="w-full bg-gray-950 hover:bg-gray-800 border border-gray-800 rounded p-3 text-left transition group">
+                        <span class="text-xs font-bold text-white">Historial por Fechas y Monto</span>
+                        <p class="text-[10px] text-gray-500 font-mono mt-1">Consulta multi-fragmento</p>
+                    </button>
+
+                    <button onclick="ejecutarDisponibilidadOperativa()" class="w-full bg-gray-950 hover:bg-gray-800 border border-gray-800 rounded p-3 text-left transition group">
+                        <span class="text-xs font-bold text-white">Disponibilidad Operativa</span>
+                        <p class="text-[10px] text-gray-500 font-mono mt-1">Restaurantes atendiendo y repartidores disponibles</p>
+                    </button>
+
+                    <div class="bg-gray-950 border border-gray-800 rounded p-3">
+                        <label class="block text-xs text-gray-400 mb-2">Pedidos por Cliente</label>
+                        <input type="number" id="txtFiltroCliId" class="w-full bg-gray-900 border border-gray-800 text-white rounded text-center text-xs py-2 focus:outline-none focus:border-green-500" placeholder="ID Cliente">
+
+                        <button onclick="ejecutarPedidosPorCliente()" class="w-full bg-green-950/60 hover:bg-green-900 text-green-400 border border-green-800 text-xs font-bold uppercase tracking-wider rounded py-2 mt-2 transition">
+                            Consulta por Cliente
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="xl:col-span-2 bg-gray-900 p-5 rounded-xl border border-gray-800 shadow-xl">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <p class="text-[10px] font-mono text-blue-400 uppercase tracking-widest mb-1">
+                            Salida 
+                        </p>
+
+                        <h2 class="text-sm font-bold uppercase tracking-wider text-gray-300">
+                            Resultados de Consultas
+                        </h2>
+
+                        <p class="text-xs text-gray-500 mt-1">
+                            Resultados de las consultas distribuidas.
+                        </p>
+                    </div>
+
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+                    <div class="lg:col-span-1 bg-gray-950 p-4 rounded-xl border border-gray-800 flex flex-col justify-center items-center h-[420px]">
+                        <canvas id="chartAnalisis" class="max-w-full max-h-full"></canvas>
+                        <p id="lblAvisoChart" class="text-xs text-gray-500 text-center font-mono mt-2">
+                            Esperando datos de ejecución...
+                        </p>
+                    </div>
+
+                    <div class="lg:col-span-2 bg-gray-950 rounded-xl border border-gray-800 overflow-hidden flex flex-col h-[420px]">
+                        <div class="bg-gray-900 px-4 py-2 border-b border-gray-800 flex justify-between items-center">
+                            <span class="text-xs font-mono font-bold text-gray-400">
+                                Consola de Consultas
+                            </span>
+
+                            <button onclick="abrirJson('consultas')" class="text-[10px] text-gray-500 hover:text-blue-400 border border-gray-800 hover:border-blue-900 rounded px-2 py-0.5 transition">
+                                JSON
+                            </button>
+                        </div>
+
+                        <div class="flex-1 overflow-auto text-xs p-4 font-mono" id="contenedorResultadoConsultas">
+                            <p class="text-gray-500 text-center mt-40">
+                                Seleccione una consulta distribuida para visualizar los resultados.
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
+    </main>
+
+    <footer class="border-t border-gray-900 bg-gray-950 px-6 py-3 text-center text-xs text-gray-500 font-mono">
+        Proyecto Final - Base de Datos Distribuidas
+    </footer>
+
+    <div id="modalJson" class="hidden fixed inset-0 bg-black/80 backdrop-blur-sm flex justify-center items-center p-4 z-50">
+        <div class="bg-gray-900 border border-gray-800 max-w-5xl w-full rounded-xl overflow-hidden shadow-2xl flex flex-col max-h-[85vh]">
+            <div class="bg-gray-950 px-4 py-3 border-b border-gray-800 flex justify-between items-center">
+                <h3 class="text-sm font-bold text-white font-mono">
+                    Respuesta JSON de la última operación
+                </h3>
+
+                <button onclick="cerrarJson()" class="text-gray-400 hover:text-white text-lg">
+                    X
+                </button>
+            </div>
+
+            <div class="p-4 overflow-auto bg-gray-950 text-green-400 font-mono text-xs whitespace-pre-wrap flex-1" id="contenidoJson">
+                No hay datos JSON registrados todavía.
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = "http://localhost:5000";
+        let graficoActual = null;
+        let ultimoJsonInsercion = null;
+        let ultimoJsonConsultas = null;
+
+        function mostrarVista(vista) {
+            const vistaInsercion = document.getElementById("vistaInsercion");
+            const vistaConsultas = document.getElementById("vistaConsultas");
+
+            const btnMenuInsercion = document.getElementById("btnMenuInsercion");
+            const btnMenuConsultas = document.getElementById("btnMenuConsultas");
+
+            if (vista === "insercion") {
+                vistaInsercion.classList.remove("hidden");
+                vistaInsercion.classList.add("grid");
+
+                vistaConsultas.classList.add("hidden");
+                vistaConsultas.classList.remove("grid");
+
+                btnMenuInsercion.className = "boton-menu-activo px-4 py-2 rounded border text-xs font-bold uppercase tracking-wider transition";
+                btnMenuConsultas.className = "boton-menu-inactivo px-4 py-2 rounded border text-xs font-bold uppercase tracking-wider transition hover:bg-gray-800";
+            } else {
+                vistaConsultas.classList.remove("hidden");
+                vistaConsultas.classList.add("grid");
+
+                vistaInsercion.classList.add("hidden");
+                vistaInsercion.classList.remove("grid");
+
+                btnMenuConsultas.className = "boton-menu-activo px-4 py-2 rounded border text-xs font-bold uppercase tracking-wider transition";
+                btnMenuInsercion.className = "boton-menu-inactivo px-4 py-2 rounded border text-xs font-bold uppercase tracking-wider transition hover:bg-gray-800";
+            }
+        }
+
+        function abrirJson(origen) {
+            const datos = origen === "consultas" ? ultimoJsonConsultas : ultimoJsonInsercion;
+
+            if (datos) {
+                document.getElementById("contenidoJson").innerText = JSON.stringify(datos, null, 2);
+            } else {
+                document.getElementById("contenidoJson").innerText = "No hay respuesta JSON registrada todavía.";
+            }
+
+            document.getElementById("modalJson").classList.remove("hidden");
+        }
+
+        function cerrarJson() {
+            document.getElementById("modalJson").classList.add("hidden");
+        }
+
+        function guardarJsonInsercion(json) {
+            ultimoJsonInsercion = json;
+        }
+
+        function guardarJsonConsultas(json) {
+            ultimoJsonConsultas = json;
+        }
+
+        function obtenerDatosRespuesta(respuestaJson) {
+            return respuestaJson.datos || {};
+        }
+
+        function obtenerResultados(respuestaJson) {
+            const datos = obtenerDatosRespuesta(respuestaJson);
+            return datos.resultados || [];
+        }
+
+        function obtenerTiempo(respuestaJson) {
+            const datos = obtenerDatosRespuesta(respuestaJson);
+
+            if (datos.tiempo_postgresql_ms !== undefined) {
+                return Number(datos.tiempo_postgresql_ms);
+            }
+
+            if (respuestaJson.tiempo_respuesta_servidor_ms !== undefined) {
+                return Number(respuestaJson.tiempo_respuesta_servidor_ms);
+            }
+
+            return 0;
+        }
+
+        function obtenerTipoConsulta(respuestaJson, valorPorDefecto) {
+            const datos = obtenerDatosRespuesta(respuestaJson);
+            return datos.tipo_consulta || valorPorDefecto;
+        }
+
+        function actualizarMetricasVisuales(tiempoMs, tipoOperacion) {
+            document.getElementById("lblLatencia").innerHTML =
+                `${Number(tiempoMs).toFixed(2)} <span class="text-xs text-green-500 font-normal">ms</span>`;
+
+            document.getElementById("lblTipoQuery").innerText = tipoOperacion;
+        }
+
+        function escribirInsercion(html) {
+            document.getElementById("contenedorResultadoInsercion").innerHTML = html;
+        }
+
+        function escribirConsultas(html) {
+            document.getElementById("contenedorResultadoConsultas").innerHTML = html;
+        }
+
+        function limpiarGrafico() {
+            if (graficoActual) {
+                graficoActual.destroy();
+                graficoActual = null;
+            }
+
+            document.getElementById("lblAvisoChart").classList.remove("hidden");
+        }
+
+        function crearGrafico(tipo, etiquetas, valores, etiqueta) {
+            if (graficoActual) {
+                graficoActual.destroy();
+            }
+
+            document.getElementById("lblAvisoChart").classList.add("hidden");
+
+            const contexto = document.getElementById("chartAnalisis").getContext("2d");
+
+            graficoActual = new Chart(contexto, {
+                type: tipo,
+                data: {
+                    labels: etiquetas,
+                    datasets: [{
+                        label: etiqueta,
+                        data: valores,
+                        backgroundColor: [
+                            "rgba(34, 197, 94, 0.45)",
+                            "rgba(59, 130, 246, 0.45)",
+                            "rgba(168, 85, 247, 0.45)",
+                            "rgba(234, 179, 8, 0.45)",
+                            "rgba(239, 68, 68, 0.45)"
+                        ],
+                        borderColor: [
+                            "rgba(34, 197, 94, 1)",
+                            "rgba(59, 130, 246, 1)",
+                            "rgba(168, 85, 247, 1)",
+                            "rgba(234, 179, 8, 1)",
+                            "rgba(239, 68, 68, 1)"
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    plugins: {
+                        legend: {
+                            display: tipo !== "bar",
+                            labels: {
+                                color: "#ffffff",
+                                font: {
+                                    size: 9
+                                }
+                            }
+                        }
+                    },
+                    scales: tipo === "bar" ? {
+                        y: {
+                            ticks: { color: "#9ca3af" },
+                            grid: { color: "#1f2937" }
+                        },
+                        x: {
+                            ticks: { color: "#9ca3af" },
+                            grid: { display: false }
+                        }
+                    } : {}
+                }
+            });
+        }
+
+        async function verificarConexion() {
+            try {
+                const respuesta = await fetch(`${API_URL}/salud`);
+                const respuestaJson = await respuesta.json();
+
+                if (!respuestaJson.correcto) {
+                    throw new Error(respuestaJson.error || "Error desconocido");
+                }
+
+                const tiempo = obtenerTiempo(respuestaJson);
+                actualizarMetricasVisuales(tiempo, "Verificación de conexión");
+
+                const html = `
+                    <p class="text-green-400 font-bold">[CONEXIÓN EXITOSA] El backend respondió correctamente.</p>
+                    <pre class="text-gray-400 mt-2 text-[11px] whitespace-pre-wrap">${JSON.stringify(respuestaJson, null, 2)}</pre>
+                `;
+
+                if (document.getElementById("vistaInsercion").classList.contains("hidden")) {
+                    guardarJsonConsultas(respuestaJson);
+                    escribirConsultas(html);
+                } else {
+                    guardarJsonInsercion(respuestaJson);
+                    escribirInsercion(html);
+                }
+
+            } catch (error) {
+                const html = `
+                    <p class="text-red-500 font-bold">[ERROR] No se pudo conectar con el backend.</p>
+                    <p class="text-gray-400 mt-2">${error.message}</p>
+                `;
+
+                if (document.getElementById("vistaInsercion").classList.contains("hidden")) {
+                    escribirConsultas(html);
+                } else {
+                    escribirInsercion(html);
+                }
+            }
+        }
+
+        document.getElementById("formPedido").addEventListener("submit", async function(evento) {
+            evento.preventDefault();
+
+            const cuerpo = {
+                cliente_id: parseInt(document.getElementById("cliId").value),
+                restaurante_id: parseInt(document.getElementById("resId").value),
+                repartidor_id: parseInt(document.getElementById("repId").value),
+                total: parseFloat(document.getElementById("totPed").value)
+            };
+
+            try {
+                const respuesta = await fetch(`${API_URL}/api/pedidos`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(cuerpo)
+                });
+
+                const respuestaJson = await respuesta.json();
+                guardarJsonInsercion(respuestaJson);
+
+                const tiempo = obtenerTiempo(respuestaJson);
+
+                if (!respuestaJson.correcto) {
+                    throw new Error(respuestaJson.error || "No se pudo insertar el pedido");
+                }
+
+                const datos = respuestaJson.datos;
+                const pedido = datos.pedido;
+                const cliente = datos.cliente;
+                const restaurante = datos.restaurante;
+                const repartidor = datos.repartidor;
+                const destino = datos.destino;
+
+                escribirInsercion(`
+                    <div class="space-y-3">
+                        <p class="text-green-400 font-bold">
+                            [PEDIDO CREADO] ${datos.mensaje}
+                        </p>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-[11px]">
+                            <div class="bg-gray-900 border border-gray-800 rounded p-3">
+                                <p class="text-gray-500 uppercase font-bold mb-1">Datos del Pedido</p>
+                                <p><span class="text-gray-400">Pedido ID:</span> <span class="text-white font-bold">#${pedido.pedido_id}</span></p>
+                                <p><span class="text-gray-400">Estado:</span> <span class="text-blue-400 font-bold">${pedido.estado}</span></p>
+                                <p><span class="text-gray-400">Total:</span> <span class="text-green-400 font-bold">$${Number(pedido.total).toFixed(2)}</span></p>
+                                <p><span class="text-gray-400">Fecha:</span> <span class="text-white">${pedido.fecha_pedido}</span></p>
+                            </div>
+
+                            <div class="bg-gray-900 border border-gray-800 rounded p-3">
+                                <p class="text-gray-500 uppercase font-bold mb-1">Datos Relacionados</p>
+                                <p><span class="text-gray-400">Cliente:</span> <span class="text-white font-bold">${cliente.nombre}</span> <span class="text-gray-500">ID ${cliente.cliente_id}</span></p>
+                                <p><span class="text-gray-400">Restaurante:</span> <span class="text-white font-bold">${restaurante.nombre}</span> <span class="text-gray-500">ID ${restaurante.restaurante_id}</span></p>
+                                <p><span class="text-gray-400">Repartidor:</span> <span class="text-white font-bold">${repartidor.nombre}</span> <span class="text-gray-500">ID ${repartidor.repartidor_id}</span></p>
+                            </div>
+                        </div>
+
+                        <div class="bg-gray-950 border border-green-900/50 rounded p-3 text-[11px]">
+                            <p class="text-green-400 font-bold uppercase mb-1">Ubicación Distribuida</p>
+                            <p><span class="text-gray-400">Fragmento:</span> <span class="text-white font-bold">${destino.fragmento_id}</span></p>
+                            <p><span class="text-gray-400">Nodo trabajador:</span> <span class="text-green-400 font-bold">${destino.nodo_trabajador}</span></p>
+                            <p><span class="text-gray-400">Detalle:</span> ${destino.etiqueta}</p>
+                        </div>
+                    </div>
+                `);
+
+                actualizarMetricasVisuales(tiempo, `Inserción dirigida por cliente_id ${cuerpo.cliente_id}`);
+                limpiarGrafico();
+
+                document.getElementById("txtWorkerDestino").innerText = destino.nodo_trabajador || "No disponible";
+                document.getElementById("txtShardIdDestino").innerText = destino.fragmento_id || "No disponible";
+                document.getElementById("metaDestinoCard").classList.remove("hidden");
+
+                document.getElementById("formPedido").reset();
+
+            } catch (error) {
+                escribirInsercion(`
+                    <p class="text-red-500 font-bold">[ERROR] No se pudo insertar el pedido.</p>
+                    <p class="text-gray-400 mt-2">${error.message}</p>
+                `);
+            }
+        });
+
+        async function eliminarPedido() {
+            const pedidoId = document.getElementById("delPedId").value;
+            const clienteId = document.getElementById("delCliId").value;
+
+            if (!pedidoId || !clienteId) {
+                alert("Debes ingresar pedido_id y cliente_id.");
+                return;
+            }
+
+            try {
+                const respuesta = await fetch(`${API_URL}/api/pedidos/${pedidoId}?cliente_id=${clienteId}`, {
+                    method: "DELETE"
+                });
+
+                const respuestaJson = await respuesta.json();
+                guardarJsonInsercion(respuestaJson);
+
+                const tiempo = obtenerTiempo(respuestaJson);
+
+                if (!respuestaJson.correcto) {
+                    throw new Error(respuestaJson.error || "No se pudo eliminar el pedido");
+                }
+
+                escribirInsercion(`
+                    <p class="text-red-400 font-bold">[ELIMINACIÓN EJECUTADA] Operación procesada.</p>
+                    <pre class="text-gray-400 mt-2 text-[11px] whitespace-pre-wrap">${JSON.stringify(respuestaJson, null, 2)}</pre>
+                `);
+
+                actualizarMetricasVisuales(tiempo, `Eliminación dirigida por cliente_id ${clienteId}`);
+                limpiarGrafico();
+
+            } catch (error) {
+                escribirInsercion(`
+                    <p class="text-red-500 font-bold">[ERROR] No se pudo eliminar el pedido.</p>
+                    <p class="text-gray-400 mt-2">${error.message}</p>
+                `);
+            }
+        }
+
+        async function buscarDestinoMeta() {
+            const clienteId = document.getElementById("searchTargetId").value;
+
+            if (!clienteId) {
+                alert("Ingresa un cliente_id.");
+                return;
+            }
+
+            try {
+                const respuesta = await fetch(`${API_URL}/api/metricas/destino/${clienteId}`);
+                const respuestaJson = await respuesta.json();
+                guardarJsonInsercion(respuestaJson);
+
+                if (!respuestaJson.correcto) {
+                    throw new Error(respuestaJson.error || "No se pudo obtener el destino");
+                }
+
+                const datos = obtenerDatosRespuesta(respuestaJson);
+
+                document.getElementById("txtWorkerDestino").innerText = datos.nodo_trabajador || "No disponible";
+                document.getElementById("txtShardIdDestino").innerText = datos.fragmento_id || "No disponible";
+                document.getElementById("metaDestinoCard").classList.remove("hidden");
+
+                actualizarMetricasVisuales(obtenerTiempo(respuestaJson), `Destino de cliente_id ${clienteId}`);
+
+                escribirInsercion(`
+                    <p class="text-green-400 font-bold">[DESTINO CALCULADO] Fragmentación horizontal por cliente_id.</p>
+                    <pre class="text-gray-400 mt-2 text-[11px] whitespace-pre-wrap">${JSON.stringify(respuestaJson, null, 2)}</pre>
+                `);
+
+            } catch (error) {
+                escribirInsercion(`
+                    <p class="text-red-500 font-bold">[ERROR] No se pudo calcular el destino.</p>
+                    <p class="text-gray-400 mt-2">${error.message}</p>
+                `);
+            }
+        }
+
+        async function simularPedidos() {
+            const cantidad = document.getElementById("cantidadSimular").value || 1000;
+
+            try {
+                const respuesta = await fetch(`${API_URL}/api/simulacion/pedidos?cantidad=${cantidad}`, {
+                    method: "POST"
+                });
+
+                const respuestaJson = await respuesta.json();
+                guardarJsonInsercion(respuestaJson);
+
+                const tiempo = obtenerTiempo(respuestaJson);
+
+                if (!respuestaJson.correcto) {
+                    throw new Error(respuestaJson.error || "No se pudo simular pedidos");
+                }
+
+                escribirInsercion(`
+                    <p class="text-yellow-400 font-bold">[SIMULACIÓN COMPLETADA] Se insertaron pedidos sintéticos.</p>
+                    <pre class="text-gray-400 mt-2 text-[11px] whitespace-pre-wrap">${JSON.stringify(respuestaJson, null, 2)}</pre>
+                `);
+
+                actualizarMetricasVisuales(tiempo, `Simulación de ${cantidad} pedidos`);
+                limpiarGrafico();
+
+            } catch (error) {
+                escribirInsercion(`
+                    <p class="text-red-500 font-bold">[ERROR] No se pudo simular pedidos.</p>
+                    <p class="text-gray-400 mt-2">${error.message}</p>
+                `);
+            }
+        }
+
+        async function ejecutarProductosMasVendidos() {
+            try {
+                const respuesta = await fetch(`${API_URL}/api/consultas/productos-mas-vendidos`);
+                const respuestaJson = await respuesta.json();
+                guardarJsonConsultas(respuestaJson);
+
+                if (!respuestaJson.correcto) {
+                    throw new Error(respuestaJson.error || "No se pudo ejecutar la consulta");
+                }
+
+                const items = obtenerResultados(respuestaJson);
+                const tiempo = obtenerTiempo(respuestaJson);
+                const tipoConsulta = obtenerTipoConsulta(respuestaJson, "Consulta agregada de productos");
+
+                actualizarMetricasVisuales(tiempo, tipoConsulta);
+
+                let tabla = `
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="text-gray-400 border-b border-gray-800">
+                                <th class="pb-1">Producto</th>
+                                <th class="pb-1 text-right">Unidades</th>
+                                <th class="pb-1 text-right">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-gray-300">
+                `;
+
+                items.forEach(item => {
+                    tabla += `
+                        <tr class="border-b border-gray-900/40">
+                            <td class="py-1 text-white font-bold">${item.producto_nombre}</td>
+                            <td class="py-1 text-right">${item.unidades_vendidas}</td>
+                            <td class="py-1 text-right text-green-400 font-bold">$${Number(item.total_vendido).toFixed(2)}</td>
+                        </tr>
+                    `;
+                });
+
+                tabla += `</tbody></table>`;
+
+                escribirConsultas(tabla);
+
+                crearGrafico(
+                    "bar",
+                    items.map(item => item.producto_nombre.substring(0, 10)),
+                    items.map(item => Number(item.total_vendido)),
+                    "Total vendido"
+                );
+
+            } catch (error) {
+                escribirConsultas(`
+                    <p class="text-red-500 font-bold">[ERROR] No se pudo obtener productos más vendidos.</p>
+                    <p class="text-gray-400 mt-2">${error.message}</p>
+                `);
+            }
+        }
+
+        async function ejecutarResumenEstados() {
+            try {
+                const respuesta = await fetch(`${API_URL}/api/consultas/resumen-estados`);
+                const respuestaJson = await respuesta.json();
+                guardarJsonConsultas(respuestaJson);
+
+                if (!respuestaJson.correcto) {
+                    throw new Error(respuestaJson.error || "No se pudo ejecutar la consulta");
+                }
+
+                const items = obtenerResultados(respuestaJson);
+                const tiempo = obtenerTiempo(respuestaJson);
+                const tipoConsulta = obtenerTipoConsulta(respuestaJson, "Consulta agregada por estado");
+
+                actualizarMetricasVisuales(tiempo, tipoConsulta);
+
+                let tabla = `
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="text-gray-400 border-b border-gray-800">
+                                <th class="pb-1">Estado</th>
+                                <th class="pb-1 text-right">Pedidos</th>
+                                <th class="pb-1 text-right">Total</th>
+                                <th class="pb-1 text-right">Promedio</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-gray-300">
+                `;
+
+                items.forEach(item => {
+                    tabla += `
+                        <tr class="border-b border-gray-900/40">
+                            <td class="py-1 text-purple-400 font-bold">${item.estado}</td>
+                            <td class="py-1 text-right">${item.cantidad_pedidos}</td>
+                            <td class="py-1 text-right font-bold">$${Number(item.total_vendido).toFixed(2)}</td>
+                            <td class="py-1 text-right text-green-400">$${Number(item.promedio_pedido).toFixed(2)}</td>
+                        </tr>
+                    `;
+                });
+
+                tabla += `</tbody></table>`;
+
+                escribirConsultas(tabla);
+
+                crearGrafico(
+                    "doughnut",
+                    items.map(item => item.estado),
+                    items.map(item => Number(item.cantidad_pedidos)),
+                    "Pedidos por estado"
+                );
+
+            } catch (error) {
+                escribirConsultas(`
+                    <p class="text-red-500 font-bold">[ERROR] No se pudo obtener resumen por estados.</p>
+                    <p class="text-gray-400 mt-2">${error.message}</p>
+                `);
+            }
+        }
+
+        async function ejecutarHistorialRangos() {
+            try {
+                const respuesta = await fetch(`${API_URL}/api/consultas/historial?fecha_inicio=2026-01-01&fecha_fin=2026-12-31&monto_minimo=30`);
+                const respuestaJson = await respuesta.json();
+                guardarJsonConsultas(respuestaJson);
+
+                if (!respuestaJson.correcto) {
+                    throw new Error(respuestaJson.error || "No se pudo ejecutar la consulta");
+                }
+
+                const items = obtenerResultados(respuestaJson);
+                const tiempo = obtenerTiempo(respuestaJson);
+                const tipoConsulta = obtenerTipoConsulta(respuestaJson, "Consulta por rango de fechas");
+
+                actualizarMetricasVisuales(tiempo, tipoConsulta);
+                limpiarGrafico();
+
+                let tabla = `
+                    <p class="text-blue-400 font-bold mb-2">[HISTORIAL] Se retornaron ${items.length} registros.</p>
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="text-gray-400 border-b border-gray-800">
+                                <th class="pb-1">Pedido</th>
+                                <th class="pb-1">Cliente</th>
+                                <th class="pb-1">Estado</th>
+                                <th class="pb-1 text-right">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-gray-300">
+                `;
+
+                items.slice(0, 20).forEach(item => {
+                    tabla += `
+                        <tr class="border-b border-gray-900/40">
+                            <td class="py-1">#${item.pedido_id}</td>
+                            <td class="py-1">${item.cliente_id}</td>
+                            <td class="py-1 text-blue-400">${item.estado}</td>
+                            <td class="py-1 text-right text-green-400 font-bold">$${Number(item.total).toFixed(2)}</td>
+                        </tr>
+                    `;
+                });
+
+                tabla += `</tbody></table>`;
+
+                escribirConsultas(tabla);
+
+            } catch (error) {
+                escribirConsultas(`
+                    <p class="text-red-500 font-bold">[ERROR] No se pudo consultar historial.</p>
+                    <p class="text-gray-400 mt-2">${error.message}</p>
+                `);
+            }
+        }
+
+        async function ejecutarDisponibilidadOperativa() {
+            try {
+                const respuesta = await fetch(`${API_URL}/api/consultas/disponibilidad-operativa`);
+                const respuestaJson = await respuesta.json();
+                guardarJsonConsultas(respuestaJson);
+
+                if (!respuestaJson.correcto) {
+                    throw new Error(respuestaJson.error || "No se pudo consultar la disponibilidad operativa");
+                }
+
+                const datos = obtenerDatosRespuesta(respuestaJson);
+                const tiempo = obtenerTiempo(respuestaJson);
+                const tipoConsulta = obtenerTipoConsulta(
+                    respuestaJson,
+                    "Lectura de disponibilidad operativa"
+                );
+
+                actualizarMetricasVisuales(tiempo, tipoConsulta);
+                limpiarGrafico();
+
+                const nodosActivos = datos.nodos_activos || [];
+                const ubicacionCopias = datos.ubicacion_copias || [];
+                const restaurantes = datos.muestra_restaurantes || [];
+                const repartidores = datos.muestra_repartidores || [];
+
+                let filasRestaurantes = "";
+
+                restaurantes.forEach(item => {
+                    filasRestaurantes += `
+                        <tr class="border-b border-gray-900/40">
+                            <td class="py-1 text-white font-bold">${item.restaurante_id}</td>
+                            <td class="py-1">${item.nombre}</td>
+                            <td class="py-1 text-green-400">${item.categoria}</td>
+                            <td class="py-1 text-right">${item.zona_id}</td>
+                        </tr>
+                    `;
+                });
+
+                let filasRepartidores = "";
+
+                repartidores.forEach(item => {
+                    filasRepartidores += `
+                        <tr class="border-b border-gray-900/40">
+                            <td class="py-1 text-white font-bold">${item.repartidor_id}</td>
+                            <td class="py-1">${item.nombre}</td>
+                            <td class="py-1 text-blue-400">${item.vehiculo || ""}</td>
+                            <td class="py-1 text-right">${item.zona_id || ""}</td>
+                        </tr>
+                    `;
+                });
+
+                let filasCopias = "";
+
+                ubicacionCopias.forEach(item => {
+                    filasCopias += `
+                        <tr class="border-b border-gray-900/40">
+                            <td class="py-1 text-purple-400 font-bold">${item.tabla}</td>
+                            <td class="py-1">${item.fragmento_id}</td>
+                            <td class="py-1 text-green-400">${item.nodo_trabajador}</td>
+                            <td class="py-1 text-right">${item.puerto}</td>
+                        </tr>
+                    `;
+                });
+
+                escribirConsultas(`
+                    <div class="space-y-4">
+
+                        <div>
+                            <p class="text-green-400 font-bold">
+                                [DISPONIBILIDAD OPERATIVA] Restaurantes atendiendo y repartidores disponibles.
+                            </p>
+
+                            <p class="text-gray-400 mt-1">
+                                ${datos.mensaje}
+                            </p>
+
+                        </div>
+
+                        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-[11px]">
+                            <div class="bg-gray-900 border border-gray-800 rounded p-3">
+                                <p class="text-gray-500 uppercase font-bold mb-1">Restaurantes</p>
+                                <p>Total registrados: <span class="text-white font-bold">${datos.resumen_restaurantes.total_restaurantes}</span></p>
+                                <p>Atendiendo: <span class="text-green-400 font-bold">${datos.resumen_restaurantes.restaurantes_atendiendo}</span></p>
+                            </div>
+
+                            <div class="bg-gray-900 border border-gray-800 rounded p-3">
+                                <p class="text-gray-500 uppercase font-bold mb-1">Repartidores</p>
+                                <p>Total registrados: <span class="text-white font-bold">${datos.resumen_repartidores.total_repartidores}</span></p>
+                                <p>Disponibles: <span class="text-green-400 font-bold">${datos.resumen_repartidores.repartidores_disponibles}</span></p>
+                            </div>
+                        </div>
+
+                        <div>
+                            <p class="text-gray-400 font-bold mb-1">Restaurantes atendiendo</p>
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="text-gray-400 border-b border-gray-800">
+                                        <th class="pb-1">ID</th>
+                                        <th class="pb-1">Nombre</th>
+                                        <th class="pb-1">Categoría</th>
+                                        <th class="pb-1 text-right">Zona</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-gray-300">
+                                    ${filasRestaurantes}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <div>
+                            <p class="text-gray-400 font-bold mb-1">Repartidores disponibles</p>
+                            <table class="w-full text-left border-collapse">
+                                <thead>
+                                    <tr class="text-gray-400 border-b border-gray-800">
+                                        <th class="pb-1">ID</th>
+                                        <th class="pb-1">Nombre</th>
+                                        <th class="pb-1">Vehículo</th>
+                                        <th class="pb-1 text-right">Zona</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-gray-300">
+                                    ${filasRepartidores}
+                                </tbody>
+                            </table>
+                        </div>
+
+                        <details class="text-[11px]">
+                            <summary class="cursor-pointer text-gray-400 hover:text-white">
+                                Ver ubicación física de las copias del catálogo
+                            </summary>
+
+                            <table class="w-full text-left border-collapse mt-2">
+                                <thead>
+                                    <tr class="text-gray-400 border-b border-gray-800">
+                                        <th class="pb-1">Tabla</th>
+                                        <th class="pb-1">Fragmento</th>
+                                        <th class="pb-1">Nodo</th>
+                                        <th class="pb-1 text-right">Puerto</th>
+                                    </tr>
+                                </thead>
+                                <tbody class="text-gray-300">
+                                    ${filasCopias}
+                                </tbody>
+                            </table>
+                        </details>
+
+                    </div>
+                `);
+
+            } catch (error) {
+                escribirConsultas(`
+                    <p class="text-red-500 font-bold">[ERROR] No se pudo consultar la disponibilidad operativa.</p>
+                    <p class="text-gray-400 mt-2">${error.message}</p>
+                `);
+            }
+        }
+
+        async function ejecutarPedidosPorCliente() {
+            const clienteId = document.getElementById("txtFiltroCliId").value;
+
+            if (!clienteId) {
+                alert("Ingresa un cliente_id.");
+                return;
+            }
+
+            try {
+                const respuesta = await fetch(`${API_URL}/api/consultas/clientes/${clienteId}/pedidos`);
+                const respuestaJson = await respuesta.json();
+                guardarJsonConsultas(respuestaJson);
+
+                if (!respuestaJson.correcto) {
+                    throw new Error(respuestaJson.error || "No se pudo ejecutar la consulta");
+                }
+
+                const items = obtenerResultados(respuestaJson);
+                const tiempo = obtenerTiempo(respuestaJson);
+                const tipoConsulta = obtenerTipoConsulta(respuestaJson, `Consulta localizada por cliente_id ${clienteId}`);
+
+                actualizarMetricasVisuales(tiempo, tipoConsulta);
+                limpiarGrafico();
+
+                if (items.length === 0) {
+                    escribirConsultas(`
+                        <p class="text-yellow-500 font-bold">[SIN RESULTADOS] No se encontraron pedidos para el cliente ${clienteId}.</p>
+                    `);
+                    return;
+                }
+
+                let tabla = `
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="text-gray-400 border-b border-gray-800">
+                                <th class="pb-1">Pedido</th>
+                                <th class="pb-1">Restaurante</th>
+                                <th class="pb-1">Repartidor</th>
+                                <th class="pb-1 text-right">Total</th>
+                            </tr>
+                        </thead>
+                        <tbody class="text-gray-300">
+                `;
+
+                items.forEach(item => {
+                    tabla += `
+                        <tr class="border-b border-gray-900/40">
+                            <td class="py-1">#${item.pedido_id}</td>
+                            <td class="py-1 text-white">${item.restaurante}</td>
+                            <td class="py-1">${item.repartidor}</td>
+                            <td class="py-1 text-right text-green-400 font-bold">$${Number(item.total).toFixed(2)}</td>
+                        </tr>
+                    `;
+                });
+
+                tabla += `</tbody></table>`;
+
+                escribirConsultas(tabla);
+
+            } catch (error) {
+                escribirConsultas(`
+                    <p class="text-red-500 font-elbold">[ERROR] No se pudo consultar pedidos del cliente.</p>
+                    <p class="text-gray-400 mt-2">${error.message}</p>
+                `);
+            }
+        }
+    </script>
+
+</body>
+</html>
