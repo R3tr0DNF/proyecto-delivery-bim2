@@ -9,14 +9,19 @@ services:
       - "35568:5432"
 
     environment:
-      POSTGRES_PASSWORD: postgres
       POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
       POSTGRES_DB: delivery_db
 
     volumes:
       - worker_data:/var/lib/postgresql/data
       - ./init:/docker-entrypoint-initdb.d
 
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d delivery_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
 volumes:
   worker_data:
-  
