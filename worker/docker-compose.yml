@@ -1,0 +1,22 @@
+services:
+  worker:
+    image: citusdata/citus:12.1
+    container_name: citus-worker
+
+    restart: unless-stopped
+
+    ports:
+      - "35568:5432"
+
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: delivery_db
+
+    volumes:
+      - worker_data:/var/lib/postgresql/data
+      - ./init:/docker-entrypoint-initdb.d
+
+volumes:
+  worker_data:
+  
