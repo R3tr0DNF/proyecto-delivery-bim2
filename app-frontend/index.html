@@ -52,6 +52,10 @@
                     Consultas Distribuidas
                 </button>
 
+                <button id="btnMenuReplicacion" onclick="mostrarVista('replicacion')" class="boton-menu-inactivo px-4 py-2 rounded border text-xs font-bold uppercase tracking-wider transition hover:bg-gray-800">
+                    Replicación Lógica
+                </button>
+
                 <button onclick="verificarConexion()" class="bg-gray-950 hover:bg-gray-800 px-4 py-2 rounded border border-gray-800 text-xs font-bold text-gray-300 uppercase tracking-wider transition">
                     Probar conexión
                 </button>
@@ -346,6 +350,136 @@
 
         </section>
 
+        <section id="vistaReplicacion" class="hidden grid grid-cols-1 xl:grid-cols-3 gap-6">
+
+            <div class="xl:col-span-1 bg-gray-900 p-5 rounded-xl border border-gray-800 shadow-xl">
+                <div class="mb-5">
+                    <p class="text-[10px] font-mono text-purple-400 uppercase tracking-widest mb-1">
+                        Módulo 3
+                    </p>
+
+                    <h2 class="text-sm font-bold uppercase tracking-wider text-gray-300">
+                        Replicación Lógica
+                    </h2>
+
+                    <p class="text-xs text-gray-500 mt-1">
+                        Verifica la replicación Publication / Subscription de la tabla de promociones entre el nodo coordinador (publicador) y el nodo suscriptor.
+                    </p>
+                </div>
+
+                <div class="space-y-3">
+                    <form id="formPromocion" class="space-y-3 bg-gray-950 border border-gray-800 rounded p-3">
+                        <h3 class="text-xs font-bold text-gray-400 uppercase">
+                            Insertar Promoción (Publicador)
+                        </h3>
+
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">ID Restaurante</label>
+                            <input type="number" id="promoRestauranteId" class="w-full bg-gray-900 border border-gray-800 rounded px-3 py-2 text-sm focus:outline-none focus:border-purple-500 text-white" placeholder="Ej: 5" required>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">Título</label>
+                            <input type="text" id="promoTitulo" class="w-full bg-gray-900 border border-gray-800 rounded px-3 py-2 text-sm focus:outline-none focus:border-purple-500 text-white" placeholder="Ej: 2x1 en pizzas" required>
+                        </div>
+
+                        <div>
+                            <label class="block text-xs text-gray-400 mb-1">Descripción</label>
+                            <input type="text" id="promoDescripcion" class="w-full bg-gray-900 border border-gray-800 rounded px-3 py-2 text-sm focus:outline-none focus:border-purple-500 text-white" placeholder="Opcional">
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1">Descuento (%)</label>
+                                <input type="number" step="0.01" id="promoDescuento" class="w-full bg-gray-900 border border-gray-800 rounded px-3 py-2 text-sm focus:outline-none focus:border-purple-500 text-white" placeholder="Ej: 15">
+                            </div>
+
+                            <div class="flex items-end pb-2">
+                                <label class="flex items-center gap-2 text-xs text-gray-400">
+                                    <input type="checkbox" id="promoActiva" class="accent-purple-600" checked>
+                                    Activa
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="grid grid-cols-2 gap-3">
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1">Fecha Inicio</label>
+                                <input type="date" id="promoFechaInicio" class="w-full bg-gray-900 border border-gray-800 rounded px-3 py-2 text-sm focus:outline-none focus:border-purple-500 text-white">
+                            </div>
+
+                            <div>
+                                <label class="block text-xs text-gray-400 mb-1">Fecha Fin</label>
+                                <input type="date" id="promoFechaFin" class="w-full bg-gray-900 border border-gray-800 rounded px-3 py-2 text-sm focus:outline-none focus:border-purple-500 text-white">
+                            </div>
+                        </div>
+
+                        <button type="submit" class="w-full bg-purple-600 hover:bg-purple-500 text-white text-xs font-bold uppercase tracking-wider py-2.5 rounded transition duration-200 shadow-lg shadow-purple-900/20">
+                            Insertar Promoción
+                        </button>
+                    </form>
+
+                    <hr class="border-gray-800">
+
+                    <button onclick="ejecutarPromociones()" class="w-full bg-gray-950 hover:bg-gray-800 border border-gray-800 rounded p-3 text-left transition group">
+                        <span class="text-xs font-bold text-white">Ver Promociones (Publicador)</span>
+                        <p class="text-[10px] text-gray-500 font-mono mt-1">Lectura directa desde el nodo coordinador</p>
+                    </button>
+
+                    <button onclick="ejecutarVerificacionReplicacion()" class="w-full bg-gray-950 hover:bg-gray-800 border border-gray-800 rounded p-3 text-left transition group">
+                        <span class="text-xs font-bold text-white">Ver Promociones (Suscriptor)</span>
+                        <p class="text-[10px] text-gray-500 font-mono mt-1">Lectura desde el nodo réplica</p>
+                    </button>
+
+                    <button onclick="compararReplicacion()" class="w-full bg-purple-950/40 hover:bg-purple-900 border border-purple-800/60 text-purple-300 text-xs font-bold uppercase tracking-wider py-3 rounded transition duration-200">
+                        Comparar Publicador vs Suscriptor
+                    </button>
+                </div>
+
+                <div id="cardEstadoReplicacion" class="hidden mt-5 p-3 bg-gray-950 rounded border border-gray-800">
+                    <p class="text-[10px] text-gray-500 font-mono uppercase mb-1">Estado de sincronización</p>
+                    <p id="txtEstadoReplicacion" class="text-sm font-bold neon-text">---</p>
+                </div>
+            </div>
+
+            <div class="xl:col-span-2 bg-gray-900 p-5 rounded-xl border border-gray-800 shadow-xl">
+                <div class="flex justify-between items-start mb-4">
+                    <div>
+                        <p class="text-[10px] font-mono text-purple-400 uppercase tracking-widest mb-1">
+                            Salida
+                        </p>
+
+                        <h2 class="text-sm font-bold uppercase tracking-wider text-gray-300">
+                            Resultado de Replicación
+                        </h2>
+
+                        <p class="text-xs text-gray-500 mt-1">
+                            Comparación de datos entre el nodo publicador y el nodo suscriptor.
+                        </p>
+                    </div>
+                </div>
+
+                <div class="bg-gray-950 rounded-xl border border-gray-800 overflow-hidden flex flex-col h-[620px]">
+                    <div class="bg-gray-900 px-4 py-2 border-b border-gray-800 flex justify-between items-center">
+                        <span class="text-xs font-mono font-bold text-gray-400">
+                            Resultado
+                        </span>
+
+                        <button onclick="abrirJson('replicacion')" class="text-[10px] text-gray-500 hover:text-purple-400 border border-gray-800 hover:border-purple-900 rounded px-2 py-0.5 transition">
+                            JSON
+                        </button>
+                    </div>
+
+                    <div class="flex-1 overflow-auto text-xs p-4 font-mono" id="contenedorResultadoReplicacion">
+                        <p class="text-gray-500 text-center mt-64">
+                            Selecciona una operación de replicación para visualizar el resultado.
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+        </section>
+
     </main>
 
     <footer class="border-t border-gray-900 bg-gray-950 px-6 py-3 text-center text-xs text-gray-500 font-mono">
@@ -375,37 +509,45 @@
         let graficoActual = null;
         let ultimoJsonInsercion = null;
         let ultimoJsonConsultas = null;
+        let ultimoJsonReplicacion = null;
+        let vistaSeleccionada = "insercion";
 
         function mostrarVista(vista) {
-            const vistaInsercion = document.getElementById("vistaInsercion");
-            const vistaConsultas = document.getElementById("vistaConsultas");
+            vistaSeleccionada = vista;
 
-            const btnMenuInsercion = document.getElementById("btnMenuInsercion");
-            const btnMenuConsultas = document.getElementById("btnMenuConsultas");
+            const vistas = {
+                insercion: document.getElementById("vistaInsercion"),
+                consultas: document.getElementById("vistaConsultas"),
+                replicacion: document.getElementById("vistaReplicacion"),
+            };
 
-            if (vista === "insercion") {
-                vistaInsercion.classList.remove("hidden");
-                vistaInsercion.classList.add("grid");
+            const botones = {
+                insercion: document.getElementById("btnMenuInsercion"),
+                consultas: document.getElementById("btnMenuConsultas"),
+                replicacion: document.getElementById("btnMenuReplicacion"),
+            };
 
-                vistaConsultas.classList.add("hidden");
-                vistaConsultas.classList.remove("grid");
-
-                btnMenuInsercion.className = "boton-menu-activo px-4 py-2 rounded border text-xs font-bold uppercase tracking-wider transition";
-                btnMenuConsultas.className = "boton-menu-inactivo px-4 py-2 rounded border text-xs font-bold uppercase tracking-wider transition hover:bg-gray-800";
-            } else {
-                vistaConsultas.classList.remove("hidden");
-                vistaConsultas.classList.add("grid");
-
-                vistaInsercion.classList.add("hidden");
-                vistaInsercion.classList.remove("grid");
-
-                btnMenuConsultas.className = "boton-menu-activo px-4 py-2 rounded border text-xs font-bold uppercase tracking-wider transition";
-                btnMenuInsercion.className = "boton-menu-inactivo px-4 py-2 rounded border text-xs font-bold uppercase tracking-wider transition hover:bg-gray-800";
-            }
+            Object.keys(vistas).forEach(function(clave) {
+                if (clave === vista) {
+                    vistas[clave].classList.remove("hidden");
+                    vistas[clave].classList.add("grid");
+                    botones[clave].className = "boton-menu-activo px-4 py-2 rounded border text-xs font-bold uppercase tracking-wider transition";
+                } else {
+                    vistas[clave].classList.add("hidden");
+                    vistas[clave].classList.remove("grid");
+                    botones[clave].className = "boton-menu-inactivo px-4 py-2 rounded border text-xs font-bold uppercase tracking-wider transition hover:bg-gray-800";
+                }
+            });
         }
 
         function abrirJson(origen) {
-            const datos = origen === "consultas" ? ultimoJsonConsultas : ultimoJsonInsercion;
+            let datos = ultimoJsonInsercion;
+
+            if (origen === "consultas") {
+                datos = ultimoJsonConsultas;
+            } else if (origen === "replicacion") {
+                datos = ultimoJsonReplicacion;
+            }
 
             if (datos) {
                 document.getElementById("contenidoJson").innerText = JSON.stringify(datos, null, 2);
@@ -426,6 +568,10 @@
 
         function guardarJsonConsultas(json) {
             ultimoJsonConsultas = json;
+        }
+
+        function guardarJsonReplicacion(json) {
+            ultimoJsonReplicacion = json;
         }
 
         function obtenerDatosRespuesta(respuestaJson) {
@@ -469,6 +615,10 @@
 
         function escribirConsultas(html) {
             document.getElementById("contenedorResultadoConsultas").innerHTML = html;
+        }
+
+        function escribirReplicacion(html) {
+            document.getElementById("contenedorResultadoReplicacion").innerHTML = html;
         }
 
         function limpiarGrafico() {
@@ -557,9 +707,12 @@
                     <pre class="text-gray-400 mt-2 text-[11px] whitespace-pre-wrap">${JSON.stringify(respuestaJson, null, 2)}</pre>
                 `;
 
-                if (document.getElementById("vistaInsercion").classList.contains("hidden")) {
+                if (vistaSeleccionada === "consultas") {
                     guardarJsonConsultas(respuestaJson);
                     escribirConsultas(html);
+                } else if (vistaSeleccionada === "replicacion") {
+                    guardarJsonReplicacion(respuestaJson);
+                    escribirReplicacion(html);
                 } else {
                     guardarJsonInsercion(respuestaJson);
                     escribirInsercion(html);
@@ -571,8 +724,10 @@
                     <p class="text-gray-400 mt-2">${error.message}</p>
                 `;
 
-                if (document.getElementById("vistaInsercion").classList.contains("hidden")) {
+                if (vistaSeleccionada === "consultas") {
                     escribirConsultas(html);
+                } else if (vistaSeleccionada === "replicacion") {
+                    escribirReplicacion(html);
                 } else {
                     escribirInsercion(html);
                 }
@@ -1162,6 +1317,257 @@
             } catch (error) {
                 escribirConsultas(`
                     <p class="text-red-500 font-elbold">[ERROR] No se pudo consultar pedidos del cliente.</p>
+                    <p class="text-gray-400 mt-2">${error.message}</p>
+                `);
+            }
+        }
+
+        document.getElementById("formPromocion").addEventListener("submit", async function(evento) {
+            evento.preventDefault();
+
+            const cuerpo = {
+                restaurante_id: parseInt(document.getElementById("promoRestauranteId").value),
+                titulo: document.getElementById("promoTitulo").value,
+                descripcion: document.getElementById("promoDescripcion").value || null,
+                descuento: document.getElementById("promoDescuento").value
+                    ? parseFloat(document.getElementById("promoDescuento").value)
+                    : null,
+                fecha_inicio: document.getElementById("promoFechaInicio").value || null,
+                fecha_fin: document.getElementById("promoFechaFin").value || null,
+                activa: document.getElementById("promoActiva").checked
+            };
+
+            try {
+                const respuesta = await fetch(`${API_URL}/api/promociones`, {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify(cuerpo)
+                });
+
+                const respuestaJson = await respuesta.json();
+                guardarJsonReplicacion(respuestaJson);
+
+                const tiempo = obtenerTiempo(respuestaJson);
+
+                if (!respuestaJson.correcto) {
+                    throw new Error(respuestaJson.error || "No se pudo insertar la promoción");
+                }
+
+                const datos = respuestaJson.datos;
+                const promocion = datos.promocion;
+                const restaurante = datos.restaurante;
+
+                actualizarMetricasVisuales(tiempo, "Inserción de promoción en publicador");
+                limpiarGrafico();
+
+                escribirReplicacion(`
+                    <div class="space-y-3">
+                        <p class="text-green-400 font-bold">
+                            [PROMOCIÓN CREADA] ${datos.mensaje}
+                        </p>
+
+                        <div class="bg-gray-900 border border-gray-800 rounded p-3 text-[11px]">
+                            <p><span class="text-gray-400">Promoción ID:</span> <span class="text-white font-bold">#${promocion.promocion_id}</span></p>
+                            <p><span class="text-gray-400">Restaurante:</span> <span class="text-white font-bold">${restaurante.nombre}</span> <span class="text-gray-500">ID ${restaurante.restaurante_id}</span></p>
+                            <p><span class="text-gray-400">Título:</span> ${promocion.titulo}</p>
+                            <p><span class="text-gray-400">Descuento:</span> ${promocion.descuento !== null && promocion.descuento !== undefined ? promocion.descuento + '%' : '—'}</p>
+                            <p><span class="text-gray-400">Estado:</span> ${promocion.activa
+                                ? '<span class="text-green-400">Activa</span>'
+                                : '<span class="text-gray-500">Inactiva</span>'}</p>
+                        </div>
+
+                        <p class="text-[10px] text-gray-500">
+                            Se insertó en el nodo publicador. Usa "Ver Promociones (Suscriptor)" o "Comparar" para verificar que ya llegó por replicación lógica.
+                        </p>
+                    </div>
+                `);
+
+                document.getElementById("formPromocion").reset();
+                document.getElementById("promoActiva").checked = true;
+
+            } catch (error) {
+                escribirReplicacion(`
+                    <p class="text-red-500 font-bold">[ERROR] No se pudo insertar la promoción.</p>
+                    <p class="text-gray-400 mt-2">${error.message}</p>
+                `);
+            }
+        });
+
+        function tablaPromociones(items) {
+            if (!items || items.length === 0) {
+                return `<p class="text-yellow-500 font-bold">Sin registros de promociones.</p>`;
+            }
+
+            let filas = "";
+
+            items.forEach(item => {
+                filas += `
+                    <tr class="border-b border-gray-900/40">
+                        <td class="py-1 text-white font-bold">#${item.promocion_id}</td>
+                        <td class="py-1">${item.restaurante_id}</td>
+                        <td class="py-1">${item.titulo}</td>
+                        <td class="py-1 text-right text-green-400 font-bold">${item.descuento}%</td>
+                        <td class="py-1 text-right">${item.activa
+                            ? '<span class="text-green-400">Activa</span>'
+                            : '<span class="text-gray-500">Inactiva</span>'}</td>
+                    </tr>
+                `;
+            });
+
+            return `
+                <table class="w-full text-left border-collapse">
+                    <thead>
+                        <tr class="text-gray-400 border-b border-gray-800">
+                            <th class="pb-1">ID</th>
+                            <th class="pb-1">Restaurante</th>
+                            <th class="pb-1">Título</th>
+                            <th class="pb-1 text-right">Descuento</th>
+                            <th class="pb-1 text-right">Estado</th>
+                        </tr>
+                    </thead>
+                    <tbody class="text-gray-300">
+                        ${filas}
+                    </tbody>
+                </table>
+            `;
+        }
+
+        async function ejecutarPromociones() {
+            try {
+                const respuesta = await fetch(`${API_URL}/api/promociones`);
+                const respuestaJson = await respuesta.json();
+                guardarJsonReplicacion(respuestaJson);
+
+                if (!respuestaJson.correcto) {
+                    throw new Error(respuestaJson.error || "No se pudo consultar las promociones");
+                }
+
+                const items = obtenerResultados(respuestaJson);
+                const tiempo = obtenerTiempo(respuestaJson);
+                const tipoConsulta = obtenerTipoConsulta(respuestaJson, "Consulta catálogo de promociones (Publicador)");
+
+                actualizarMetricasVisuales(tiempo, tipoConsulta);
+
+                escribirReplicacion(`
+                    <p class="text-green-400 font-bold mb-2">
+                        [PUBLICADOR] Nodo coordinador. ${items.length} promociones encontradas.
+                    </p>
+                    ${tablaPromociones(items)}
+                `);
+
+            } catch (error) {
+                escribirReplicacion(`
+                    <p class="text-red-500 font-bold">[ERROR] No se pudo consultar las promociones del publicador.</p>
+                    <p class="text-gray-400 mt-2">${error.message}</p>
+                `);
+            }
+        }
+
+        async function ejecutarVerificacionReplicacion() {
+            try {
+                const respuesta = await fetch(`${API_URL}/api/replicacion/promociones`);
+                const respuestaJson = await respuesta.json();
+                guardarJsonReplicacion(respuestaJson);
+
+                if (!respuestaJson.correcto) {
+                    throw new Error(respuestaJson.error || "No se pudo verificar la replicación");
+                }
+
+                const datos = obtenerDatosRespuesta(respuestaJson);
+                const items = datos.resultados || [];
+                const tiempo = obtenerTiempo(respuestaJson);
+                const tipoConsulta = obtenerTipoConsulta(respuestaJson, "Verificación Publication / Subscription");
+
+                actualizarMetricasVisuales(tiempo, tipoConsulta);
+
+                escribirReplicacion(`
+                    <p class="text-blue-400 font-bold mb-2">
+                        [SUSCRIPTOR] Nodo réplica. ${datos.cantidad !== undefined ? datos.cantidad : items.length} promociones replicadas.
+                    </p>
+                    ${tablaPromociones(items)}
+                `);
+
+            } catch (error) {
+                escribirReplicacion(`
+                    <p class="text-red-500 font-bold">[ERROR] No se pudo verificar la replicación en el suscriptor.</p>
+                    <p class="text-gray-400 mt-2">${error.message}</p>
+                `);
+            }
+        }
+
+        async function compararReplicacion() {
+            try {
+                const [respPub, respSub] = await Promise.all([
+                    fetch(`${API_URL}/api/promociones`),
+                    fetch(`${API_URL}/api/replicacion/promociones`)
+                ]);
+
+                const jsonPub = await respPub.json();
+                const jsonSub = await respSub.json();
+
+                guardarJsonReplicacion({ publicador: jsonPub, suscriptor: jsonSub });
+
+                if (!jsonPub.correcto || !jsonSub.correcto) {
+                    throw new Error(jsonPub.error || jsonSub.error || "No se pudo comparar la replicación");
+                }
+
+                const itemsPub = obtenerResultados(jsonPub);
+                const datosSub = obtenerDatosRespuesta(jsonSub);
+                const itemsSub = datosSub.resultados || [];
+
+                const tiempoPub = obtenerTiempo(jsonPub);
+                actualizarMetricasVisuales(tiempoPub, "Comparación Publicador vs Suscriptor");
+                limpiarGrafico();
+
+                const normalizar = items => items
+                    .map(item => `${item.promocion_id}|${item.restaurante_id}|${item.titulo}|${item.descuento}|${item.activa}`)
+                    .sort()
+                    .join(";");
+
+                const sincronizado = itemsPub.length === itemsSub.length
+                    && normalizar(itemsPub) === normalizar(itemsSub);
+
+                const cardEstado = document.getElementById("cardEstadoReplicacion");
+                const txtEstado = document.getElementById("txtEstadoReplicacion");
+                cardEstado.classList.remove("hidden");
+
+                if (sincronizado) {
+                    txtEstado.className = "text-sm font-bold text-green-400 neon-text";
+                    txtEstado.innerText = `Sincronizado (${itemsPub.length} registros)`;
+                } else {
+                    txtEstado.className = "text-sm font-bold text-yellow-400 neon-text";
+                    txtEstado.innerText = `Desincronizado (Publicador: ${itemsPub.length} / Suscriptor: ${itemsSub.length})`;
+                }
+
+                escribirReplicacion(`
+                    <div class="space-y-4">
+                        <p class="${sincronizado ? 'text-green-400' : 'text-yellow-400'} font-bold">
+                            [${sincronizado ? 'REPLICACIÓN OK' : 'DIFERENCIAS DETECTADAS'}] Comparación entre nodo publicador y nodo suscriptor.
+                        </p>
+
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-4">
+                            <div>
+                                <p class="text-gray-400 font-bold mb-1 uppercase text-[11px]">
+                                    Publicador (Coordinador) — ${itemsPub.length} registros
+                                </p>
+                                ${tablaPromociones(itemsPub)}
+                            </div>
+
+                            <div>
+                                <p class="text-gray-400 font-bold mb-1 uppercase text-[11px]">
+                                    Suscriptor (Réplica) — ${itemsSub.length} registros
+                                </p>
+                                ${tablaPromociones(itemsSub)}
+                            </div>
+                        </div>
+                    </div>
+                `);
+
+            } catch (error) {
+                escribirReplicacion(`
+                    <p class="text-red-500 font-bold">[ERROR] No se pudo comparar publicador y suscriptor.</p>
                     <p class="text-gray-400 mt-2">${error.message}</p>
                 `);
             }

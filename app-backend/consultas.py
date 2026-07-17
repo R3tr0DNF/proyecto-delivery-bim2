@@ -629,3 +629,139 @@ def consultar_disponibilidad_operativa():
         }
 
     return medir_tiempo(consulta)
+
+# ===========================
+# PUBLICATION / SUBSCRIPTION
+# ===========================
+
+SUBSCRIBER_CONFIG = {
+    "host": os.getenv("SUB_HOST", "localhost"),
+    "port": int(os.getenv("SUB_PORT", "5433")),
+    "dbname": os.getenv("SUB_NAME", "postgres"),
+    "user": os.getenv("SUB_USER", "postgres"),
+    "password": os.getenv("SUB_PASSWORD", "postgres"),
+}
+
+def obtener_conexion_subscriber():
+    return psycopg2.connect(**SUBSCRIBER_CONFIG)
+
+
+def insertar_promocion(restaurante_id, titulo, descripcion=None, descuento=None,
+                        fecha_inicio=None, fecha_fin=None, activa=True):
+    def consulta():
+        with obtener_conexion() as conexion:
+            with conexion.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
+
+                cursor.execute(
+                    """
+                    SELECT nombre
+                    FROM restaurantes
+                    WHERE restaurante_id = %s;
+                    """,
+                    (restaurante_id,),
+                )
+                restaurante = cursor.fetchone()
+
+                if not restaurante:
+                    raise Exception(f"No existe un restaurante con ID {restaurante_id}")
+
+                cursor.execute(
+                    """
+                    INSERT INTO promociones
+                        (restaurante_id, titulo, descripcion, descuento, fecha_inicio, fecha_fin, activa)
+                    VALUES
+                        (%s, %s, %s, %s, %s, %s, %s)
+                    RETURNING
+                        promocion_id,
+                        restaurante_id,
+                        titulo,
+                        descripcion,
+                        descuento,
+                        fecha_inicio,
+                        fecha_fin,
+                        activa;
+                    """,
+                    (
+                        restaurante_id,
+                        titulo,
+                        descripcion or None,
+                        Decimal(str(descuento)) if descuento not in (None, "") else None,
+                        fecha_inicio or None,
+                        fecha_fin or None,
+                        bool(activa),
+                    ),
+                )
+
+                promocion = dict(cursor.fetchone())
+
+            conexion.commit()
+
+        return {
+            "promocion": normalizar_fila(promocion),
+            "restaurante": {
+                "restaurante_id": restaurante_id,
+                "nombre": restaurante["nombre"],
+            },
+            "mensaje": f"Promoción '{titulo}' creada en el publicador (nodo coordinador)."
+        }
+
+    return medir_tiempo(consulta)
+
+
+def consultar_promociones():
+    sql = """
+        SELECT
+            promocion_id,
+            restaurante_id,
+            titulo,
+            descripcion,
+            descuento,
+            fecha_inicio,
+            fecha_fin,
+            activa
+        FROM promociones
+        ORDER BY promocion_id;
+    """
+
+    def consulta():
+        tiempo_postgresql = obtener_tiempo_postgresql(sql)
+
+        with obtener_conexion() as conexion:
+            with conexion.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
+                cursor.execute(sql)
+                filas = normalizar_filas(filas_a_diccionarios(cursor))
+
+        return {
+            "resultados": filas,
+            "tiempo_postgresql_ms": tiempo_postgresql,
+            "tipo_consulta": "Consulta catálogo de promociones"
+        }
+
+    return medir_tiempo(consulta)
+
+
+def verificar_replicacion_promociones():
+
+    def consulta():
+        with obtener_conexion_subscriber() as conexion:
+            with conexion.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cursor:
+                cursor.execute("""
+                    SELECT
+                        promocion_id,
+                        restaurante_id,
+                        titulo,
+                        descuento,
+                        activa
+                    FROM promociones
+                    ORDER BY promocion_id;
+                """)
+
+                filas = normalizar_filas(filas_a_diccionarios(cursor))
+
+        return {
+            "cantidad": len(filas),
+            "resultados": filas,
+            "tipo_consulta": "Verificación Publication / Subscription"
+        }
+
+    return medir_tiempo(consulta)
