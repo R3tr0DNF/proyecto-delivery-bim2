@@ -5,6 +5,7 @@ DROP TABLE IF EXISTS pedidos CASCADE;
 DROP TABLE IF EXISTS clientes CASCADE;
 DROP TABLE IF EXISTS restaurantes CASCADE;
 DROP TABLE IF EXISTS repartidores CASCADE;
+DROP TABLE IF EXISTS promociones CASCADE;
 
 --Tabla Clientes
 
@@ -62,4 +63,15 @@ CREATE TABLE detalle_pedidos (
     cantidad INT NOT NULL,
     precio_unitario NUMERIC(10, 2) NOT NULL,
     PRIMARY KEY (detalle_id, cliente_id)
+);
+
+CREATE TABLE promociones (
+    promocion_id SERIAL PRIMARY KEY,
+    restaurante_id INT NOT NULL REFERENCES restaurantes(restaurante_id),
+    titulo VARCHAR(100) NOT NULL,
+    descripcion TEXT,
+    descuento DECIMAL(5,2),
+    fecha_inicio DATE,
+    fecha_fin DATE,
+    activa BOOLEAN DEFAULT TRUE
 );
