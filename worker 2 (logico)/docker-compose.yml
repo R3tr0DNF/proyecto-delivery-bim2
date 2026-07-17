@@ -1,0 +1,48 @@
+services:
+
+  subscriber:
+
+    image: postgres:16
+
+    container_name: postgres-subscriber
+
+    restart: unless-stopped
+
+    ports:
+      - "35569:5432"
+
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DB: delivery_db
+
+    volumes:
+      - subscriber_data:/var/lib/postgresql/data
+
+    healthcheck:
+      test: ["CMD-SHELL","pg_isready -U postgres -d delivery_db"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
+
+  pgadmin:
+
+    image: dpage/pgadmin4
+
+    container_name: pgadmin-subscriber
+
+    restart: unless-stopped
+
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin
+
+    ports:
+      - "8081:80"
+
+    depends_on:
+      subscriber:
+        condition: service_healthy
+
+volumes:
+  subscriber_data:
